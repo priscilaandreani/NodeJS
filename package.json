@@ -1,0 +1,17 @@
+{
+  "name": "conceitos",
+  "version": "0.0.1",
+  "description": "aula 01 do bootcamp GoStack",
+  "main": "src/index.js",
+  "author": "Priscila Andreani",
+  "license": "MIT",
+  "scripts": {
+    "dev": "nodemon"
+  },
+  "dependencies": {
+    "express": "^4.17.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.6"
+  }
+}
