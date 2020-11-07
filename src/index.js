@@ -1,57 +1,64 @@
 const { response, request } = require('express');
 const express = require('express');
+const { v4: uuidv4 } = require('uuid');
 
 const app = express();
 
-///// API recives JSONS files, every data file pass through express.json()
-//identificar que a API vai receber dados em formato de JSON
-//o use faz com que todas os dados passem pela função express.json()
 app.use(express.json());
 
 const projects = [];
 
-//two attributes
-//dois atributos (recurso, arrow function que retorna a resposta (geralmente em json {} || [] ))
 app.get('/projects', (request, response) => {
-  //query params
-  const params = request.query;
-  console.log(params);
-  //{ title: 'React', owner: 'Priscila' }
+  const { title } = request.query;
 
-  const { title, owner } = request.query;
-  console.log(title);
-  // React
-  console.log(owner);
-  // Priscila
+  const results = title
+    ? projects.filter((project) => project.title.includes(title))
+    : projects;
 
-  return response.json(['Projeto 01', 'Projeto 02']);
+  return response.json(results);
 });
 
 app.post('/projects', (request, response) => {
-  //request body params:
-  const body = request.body;
-  console.log(body);
+  const { title, owner } = request.body;
 
-  return response.json(['Projeto 01', 'Projeto 02', 'Projeto 03']);
+  const project = { title, owner, id: uuidv4() };
+  projects.push(project);
+
+  return response.json(project);
 });
 
-//every PUT has a identifier parameter (id)
-//todo PUT tem que passar um parâmetro identificador (id)
 app.put('/projects/:id', (request, response) => {
-  //rote params
+  const { title, owner } = request.body;
   const { id } = request.params;
-  console.log(id);
 
-  return response.json(['Projeto 04', 'Projeto 02', 'Projeto 03']);
+  const projectIndex = projects.findIndex((project) => project.id === id);
+  if (projectIndex < 0) {
+    return response.status(400).json({ error: 'Project not found.' });
+  }
+
+  const project = {
+    id,
+    title,
+    owner,
+  };
+
+  projects[projectIndex] = project;
+
+  return response.json(project);
 });
 
-//every DELETE has a identifier parameter
-//todo DELETE tem que passar um parametro identificador
 app.delete('/projects/:id', (request, response) => {
-  return response.json(['Projeto 02', 'Projeto 03']);
+  const { id } = request.params;
+
+  const projectIndex = projects.findIndex((project) => project.id === id);
+  if (projectIndex < 0) {
+    return response.status(400).json({ error: 'Project not found.' });
+  }
+  projects.splice(projectIndex, 1);
+
+  return response.status(204).send();
 });
 
-//escutar a porta 3333
 app.listen(3333, () => {
   console.log('Back-end started! 😜');
 });
